@@ -8,6 +8,11 @@
 
 from pytb import * # import TB model class
 import pylab as pl
+import random
+
+pl.ion()
+
+#print random.gauss(0,0.1)
 
 # Huckel type molecule...
 # SiteE = Ionisation Potential
@@ -41,12 +46,9 @@ kpts=k_path(path,100)
 
 finite_model=my_model.cut_piece(100,0,glue_edgs=False) #glue_edgs makes system periodic
 
-(evals,eigs)=finite_model.solve_all(eig_vectors=True)
-print ("Eigenvalues, non beta phase"),evals
-
-#OK, a bith filthy here, there's no access method for the site_energies themselves...
-#self._site_energies=nu.array(en_list)
-#finite_model._site_energies[10]=-1.1
+for i in range(99):
+    finite_model._site_energies[i]=finite_model._site_energies[i]+random.gauss(0,0.05)
+    finite_model._hoppings[i][0]=finite_model._hoppings[i][0]+random.gauss(0,0.05)
 
 finite_model.display()
 
@@ -55,15 +57,25 @@ finite_model.display()
 
 # start outputting useful info
 
+
 print("Eigenvalues, Finite model"),evals
-
+#Initialise our figures...
 fig=pl.figure()
-pl.subplot(311)
 
-(evals,eigs)=finite_model.solve_all(eig_vectors=True)
-#pl.plot(eigs[0]*eigs[0])
+pl.subplot(411)
+pl.title("Beta Phase - 1D Tight Binding Model - Disordered")
+pl.ylabel("Occ %")
 
-pl.title("Beta Phase - 1D Tight Binding Model")
+pl.subplot(412)
+pl.ylabel("Energy")
+
+pl.subplot(413)
+pl.ylabel("Energy")
+
+pl.subplot(414)
+pl.xlabel("Site, or # of Beta Phase Bubbles")
+
+pl.ylabel("Energy (always)")
 
 energies=[]
 
@@ -71,35 +83,50 @@ energies=[]
 (evals,eigs)=finite_model.solve_all(eig_vectors=True)
 print evals[0]
 energies.append(evals[0])
-pl.subplot(311)
-pl.plot(eigs[0]*eigs[0])
-pl.subplot(312)
+pl.subplot(411)
+pl.plot(evals[0]+eigs[0]*eigs[0])
+pl.subplot(412)
 pl.plot(finite_model._site_energies)
+print "Raw Hoppings: ",finite_model._hoppings
+#pl.plot(finite_model._hoppings[::][1])
+
+fig.canvas.draw()
+pl.show()
 
 for i in range(75,85,1):
     finite_model._site_energies[i]=finite_model._site_energies[i]-trapE
 
-for i in range(25,32,1):
-    finite_model._site_energies[i]=finite_model._site_energies[i]-trapE #From NWCHEM / BNL calc on PFO
+b=5
+for i in range(25,45,b):
+    for j in range(i,i+b): #filthy
+        finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
     # See: /work/jmf02/NWCHEM/BETA-PHASE/tune_beta_alpha
     #finite_model._site_energies[10]=finite_model._site_energies[10]-0.01
     (evals,eigs)=finite_model.solve_all(eig_vectors=True)
     print evals[0]
     energies.append(evals[0]) #log of first eigenvalues
-    pl.subplot(311)
-    pl.plot(eigs[0]*eigs[0])
-    pl.plot(eigs[1]*eigs[1])
-    pl.subplot(312)
+
+    pl.subplot(411)
+    for i in range(0,1):
+        pl.fill_between(range(100),evals[i],evals[i]+eigs[i]*eigs[i], facecolor='green')
+
+    pl.subplot(412)
     pl.ylim(-1.1,-1.0)
     pl.plot(finite_model._site_energies)
-# plot band structure
 
-pl.subplot(313)
+    pl.subplot(413)
+    pl.plot(evals)
+
+    pl.subplot(414)
+    pl.hist(evals,50)
+
+    pl.draw()
+
+pl.subplot(413)
 pl.plot(energies)
 
 #Top Subplot
-#pl.hist(evals,50)
-#pl.plot(evals)
+pl.plot(evals)
 
 
 #Bottom Subplot
@@ -109,7 +136,6 @@ pl.plot(energies)
 #pl.plot(eigs[0]*eigs[0])
 #pl.plot(finite_model._site_energies)
 #print("Eigenvectors, first band, orbital"),eigs[0,:]
-
 
 pl.show()
 #pl.savefig("beta.pdf")
