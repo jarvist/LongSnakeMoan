@@ -10,6 +10,7 @@ from pytb import * # import TB model class
 import pylab as pl
 import random
 import datetime
+from math import *
 
 pl.ion()
 
@@ -21,6 +22,8 @@ pl.ion()
 siteE=5.853060  #5.853060
 J=0.6
 trapE=0.176
+siteSigma=0.05
+JSigma=0.3 #0.5
 
 # specify model
 # Define Lattice Vectors
@@ -47,9 +50,11 @@ kpts=k_path(path,100)
 
 finite_model=my_model.cut_piece(100,0,glue_edgs=False) #glue_edgs makes system periodic
 
+print finite_model._hoppings
+
 for i in range(99):
-    finite_model._site_energies[i]=finite_model._site_energies[i]+random.gauss(0,0.05)
-    finite_model._hoppings[i][0]=finite_model._hoppings[i][0]+random.gauss(0,0.05)
+    finite_model._site_energies[i]=finite_model._site_energies[i]+random.gauss(0,siteSigma)
+    finite_model._hoppings[i][0]=finite_model._hoppings[i][0]*(cos(random.gauss(0,JSigma))**2)
 
 finite_model.display()
 
@@ -64,7 +69,7 @@ print("Eigenvalues, Finite model"),evals
 fig=pl.figure()
 
 pl.subplot(411)
-pl.title("Beta Phase - 1D Tight Binding Model - Disordered")
+pl.title("Beta-PFO 1D pyTB - Disordered\nSigma=%s JSigma=%s"%(siteSigma,JSigma))
 
 energies=[]
 
@@ -104,10 +109,13 @@ for i, colour in zip(range(25,45,b),colours):
 
     #Plot Eigenvalues - not sure how useful this display is
     pl.subplot(413)
-    pl.ylabel("Eigenvalues\n(eV)")
     pl.yticks(fontsize=9)
 
-    pl.plot(evals,color=colour)
+    pl.ylabel("Js (eV)")
+    pl.plot(zip(*finite_model._hoppings)[0])
+
+#    pl.ylabel("Eigenvalues\n(eV)")
+#    pl.plot(evals,color=colour)
 
     #Plot DoS
     pl.subplot(414)
@@ -121,15 +129,16 @@ for i, colour in zip(range(25,45,b),colours):
 
     for j in range(i,i+b): #filthy
         finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
+        finite_model._hoppings[j][0]=-J-0.3
     # See: /work/jmf02/NWCHEM/BETA-PHASE/tune_beta_alpha
     #finite_model._site_energies[10]=finite_model._site_energies[10]-0.01
  
 
-pl.subplot(413)
-pl.plot(energies)
+#pl.subplot(413)
+#pl.plot(energies)
 
 #Top Subplot
-pl.plot(evals)
+#pl.plot(evals)
 
 #For some reason this finally holds the window open
 pl.show()
