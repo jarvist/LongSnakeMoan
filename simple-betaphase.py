@@ -22,8 +22,8 @@ pl.ion()
 siteE=5.853060  #5.853060
 J=0.6
 trapE=0.176
-siteSigma=0.05
-JSigma=0.3 #0.5
+siteSigma=0.05 #0.05
+JSigma=0.5 #0.5
 
 # specify model
 # Define Lattice Vectors
@@ -36,7 +36,7 @@ my_model=tbmodel(1,1,lat,orb)
 # set on-site energies
 my_model.set_sites([siteE])
 
-my_model.add_hop(-J, 0, 0, [1])
+my_model.add_hop(J, 0, 0, [1])
 
 my_model.display()
 
@@ -97,11 +97,12 @@ for i, colour in zip(range(25,45,b),colours):
     for j in range(0,5):
         pl.fill_between(range(100),evals[j],evals[j]+eigs[j]*eigs[j], facecolor=colour)
     pl.ylabel("Occ %")
+    pl.ylim((3.8,5.0))
     pl.yticks(fontsize=9)
 
     #Plot Hamiltonian
     pl.subplot(412)
-    pl.ylim(-1.1,-1.0)
+    pl.ylim((5.5,6.0))
     pl.ylabel("Hamiltonian\n(eV)")
     pl.yticks(fontsize=9)
 
@@ -109,6 +110,7 @@ for i, colour in zip(range(25,45,b),colours):
 
     #Plot Eigenvalues - not sure how useful this display is
     pl.subplot(413)
+    pl.ylim((0.0,1.0))
     pl.yticks(fontsize=9)
 
     pl.ylabel("Js (eV)")
@@ -124,12 +126,15 @@ for i, colour in zip(range(25,45,b),colours):
     pl.xlabel("Tight Binding Site (#) / DoS Histogram (eV)") #xLabel for shared axes
 
     pl.hist(evals,50,color=colour)
+    pl.hist(zip(*finite_model._hoppings)[0],50,color=colour)
 
     pl.draw()
 
+    # Modifies the 'Beta Bubble' region of the Hamiltonian
     for j in range(i,i+b): #filthy
-        finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
-        finite_model._hoppings[j][0]=-J-0.3
+#        finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
+        finite_model._hoppings[j][0]=J +0.3 #Perfect transfer integrals
+    #    finite_model._hoppings[j][0]=finite_model._hoppings[j][0]-0.3 #i.e. in addition to any disorder
     # See: /work/jmf02/NWCHEM/BETA-PHASE/tune_beta_alpha
     #finite_model._site_energies[10]=finite_model._site_energies[10]-0.01
  
@@ -141,9 +146,13 @@ for i, colour in zip(range(25,45,b),colours):
 #pl.plot(evals)
 
 #For some reason this finally holds the window open
-pl.show()
+
+
 
 print "Saving figures...(one moment please)"
 now=datetime.datetime.now().strftime("%Y-%m-%d-%H:%M")
+pl.annotate("JMF %s"%now,xy=(0.75,0.02),xycoords='figure fraction')
+pl.show()
+
 fig.savefig("%s-BetaPhasePyTB.pdf"%now)
 fig.savefig("%s-BetaPhasePyTB.png"%now)
