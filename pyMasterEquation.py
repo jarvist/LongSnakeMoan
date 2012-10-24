@@ -6,6 +6,12 @@ import pylab as p
 
 Har = 27.21 #1 Hartree in eV
 
+LAMBDA = 0.5 #lattice reorganisation energy in units eV
+K_BOLTZMANN = 8.6173857e-5 #in units of eV
+T = 300.0 #in Kelvin
+
+THERMAL=(1.0/(4*LAMBDA*K_BOLTZMANN*T)) #frac{1}{4 \lambda k_{B} T}
+
 # the function takes as argument:
 # n-> number of sites
 # d-> the distance of the PCBM molecule (in Bohr Radii)
@@ -52,6 +58,19 @@ def BetaHamiltonian(n,b,E,j,J):
     print H
     return H
 
+
+def MasterEquation(n,H):
+    M=zeros( (n,n) )
+    for i in range(0,n):
+        for j in range(0,n):
+            dG=H[i,i]-H[j,j] #Site energy difference, from Hamiltonian
+            dE=-LAMBDA+dG-(j-i)*0.01 #0.01 is ElectricField
+            M[i,j]=H[i,j]*H[i,j]*exp(dE*dE*THERMAL)   #MARCUS HOPPING RATE
+    for i in range (0,n):
+        M[i,i]=0.0
+        M[i,i]=-sum(M[0:n,i]) #slice, to get [i,i] trace = negative sum of rates
+    return M
+
 def GetLowestEV(H):
     vals = eigvalsh(H)
     print  
@@ -85,32 +104,11 @@ eps =      4.
 n   =      21  
 t   =      1.
 
-#nrginf    = GetLowestEVrinf(n,t) 
 
-#n=21
-#energies  = zeros(n) # initialise the energies
-#for i in range(0,n):
-#    energies[i] =  GetLowestEV(BetaHamiltonian(n,i,-0.1,0.01,0.01))
-
-#n=11
-#energies2  = zeros(n) # initialise the energies
-#for i in range(0,n):
-#    energies2[i] =  GetLowestEV(BetaHamiltonian(n,i,-0.1,0.01,0.01))
-
-#n=8
-#energies3  = zeros(n) # initialise the energies
-#for i in range(0,n):
-#    energies3[i] =  GetLowestEV(BetaHamiltonian(n,i,-0.1,0.01,0.01))
-
-#p.plot(range(0,21), energies, range(0,11), energies2, range(0,8), energies3)
-#('n=21', 'n=11','n=8')
-#p.legend(('Test'))
-#p.show()
-
-n=10 #needs to be even?
+n=4 #needs to be even?
 E=0.1
-j=-0.01
-J=-0.1
+j=-0.06
+J=-0.6
 
 #energies  = zeros(n)
 #for i in range(2,n):
@@ -119,19 +117,20 @@ J=-0.1
 print "Betaphase"
 print "Eigenvectors"
 BetaH=BetaHamiltonian(n,4,E,j,J)
-w,v=eigh(BetaH)
-print "Eigenvalues", w
-print "Eigenvectors", v
-print "first Eigenvector..." 
-print v[0]
-print "Eigenvector squared..."
-print v[0]*v[0]
+#w,v=eigh(BetaH)
+#print "Eigenvalues", w
+#print "Eigenvectors", v
+#print "first Eigenvector..." 
+#print v[0]
+#print "Eigenvector squared..."
+#print v[0]*v[0]
 
-trace=zeros ((n))
-for i in range(0,n):
-    trace[i]=BetaH[i][i]
+M=MasterEquation(n,BetaH)
 
-p.plot (range(0,n),trace,
+print "Hamiltonian:\n",BetaH
+print "Master Equation Rates:\n",M
+
+p.plot (
         range(0,n),v[0]*v[0])
 #        range(0,n),v[1]*v[1],
 #        range(0,n),v[1]*v[1]+v[0]*v[0])
@@ -143,23 +142,5 @@ p.plot (range(0,n),trace,
 #p.legend(('Hamiltonian','Beta - Eigenvector_0^2','Beta - Eigenvector_1^2','Beta - Eigenvector_0^2 + Eigenvector_1^2'))
 p.show()
 
-
-
-print "Pure Alpha"
-ww,vv=eigh(BetaHamiltonian(n,0,E,j,J))
-print "Eigenvalues", ww
-
-p.plot (
-        range(0,n),v[0]*v[0],
-        range(0,n),vv[0]*vv[0],
-        range(0,n),v[1]*v[1],
-        range(0,n),v[1]*v[1]+v[0]*v[0])
-        #        range(0,n),v[1]*v[1],
-#        range(0,n),v[1]*v[1]+v[0]*v[0])
-#,
-#        range(0,n),v[2]*v[2], 
-#        range(0,n),energies)
-p.legend(('Beta - Eigenvector_0^2','Alpha - Eigenvectors_0^2','Beta - Eigenvector_1^2','Beta - Eigenvector_0^2 + Eigenvector_1^2'))
-p.show()
 
 

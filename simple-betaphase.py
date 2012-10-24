@@ -9,6 +9,7 @@
 from pytb import * # import TB model class
 import pylab as pl
 import random
+import datetime
 
 pl.ion()
 
@@ -64,63 +65,65 @@ fig=pl.figure()
 
 pl.subplot(411)
 pl.title("Beta Phase - 1D Tight Binding Model - Disordered")
-pl.ylabel("Occ %")
-
-pl.subplot(412)
-pl.ylabel("Energy")
-
-pl.subplot(413)
-pl.ylabel("Energy")
-
-pl.subplot(414)
-pl.xlabel("Site, or # of Beta Phase Bubbles")
-
-pl.ylabel("Energy (always)")
 
 energies=[]
-
-#OK; now we have a 'Alpha phase' bit of Huckel tight binding
-(evals,eigs)=finite_model.solve_all(eig_vectors=True)
-print evals[0]
-energies.append(evals[0])
-pl.subplot(411)
-pl.plot(evals[0]+eigs[0]*eigs[0])
-pl.subplot(412)
-pl.plot(finite_model._site_energies)
-print "Raw Hoppings: ",finite_model._hoppings
-#pl.plot(finite_model._hoppings[::][1])
-
-fig.canvas.draw()
-pl.show()
 
 for i in range(75,85,1):
     finite_model._site_energies[i]=finite_model._site_energies[i]-trapE
 
-b=5
-for i in range(25,45,b):
-    for j in range(i,i+b): #filthy
-        finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
-    # See: /work/jmf02/NWCHEM/BETA-PHASE/tune_beta_alpha
-    #finite_model._site_energies[10]=finite_model._site_energies[10]-0.01
+F=0.01 #V/site, roughly equiv. to V/nm. 
+#Thomas K says 1V/100nm is about right for an Organic Solar Cell at Short Circuit
+
+#Apply electric field gradient across model
+#for i in range(1,100):
+#    finite_model._site_energies[i]=finite_model._site_energies[i]-(i*F)
+
+colours='bgrcmykkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
+  # Aaah, we fade to grey (fade to grey)
+b=10
+for i, colour in zip(range(25,45,b),colours):
+    print "Iterate value i=",i," colour value",colour
     (evals,eigs)=finite_model.solve_all(eig_vectors=True)
     print evals[0]
     energies.append(evals[0]) #log of first eigenvalues
 
+    #Plot Eigenvalues with filled-in Eigenvectors^2 / electron probabilities
     pl.subplot(411)
-    for i in range(0,1):
-        pl.fill_between(range(100),evals[i],evals[i]+eigs[i]*eigs[i], facecolor='green')
+    for j in range(0,5):
+        pl.fill_between(range(100),evals[j],evals[j]+eigs[j]*eigs[j], facecolor=colour)
+    pl.ylabel("Occ %")
+    pl.yticks(fontsize=9)
 
+    #Plot Hamiltonian
     pl.subplot(412)
     pl.ylim(-1.1,-1.0)
-    pl.plot(finite_model._site_energies)
+    pl.ylabel("Hamiltonian\n(eV)")
+    pl.yticks(fontsize=9)
 
+    pl.plot(finite_model._site_energies,color=colour)
+
+    #Plot Eigenvalues - not sure how useful this display is
     pl.subplot(413)
-    pl.plot(evals)
+    pl.ylabel("Eigenvalues\n(eV)")
+    pl.yticks(fontsize=9)
 
+    pl.plot(evals,color=colour)
+
+    #Plot DoS
     pl.subplot(414)
-    pl.hist(evals,50)
+    pl.ylabel("DoS (#, eV)")
+    pl.yticks(fontsize=9)
+    pl.xlabel("Tight Binding Site (#) / DoS Histogram (eV)") #xLabel for shared axes
+
+    pl.hist(evals,50,color=colour)
 
     pl.draw()
+
+    for j in range(i,i+b): #filthy
+        finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
+    # See: /work/jmf02/NWCHEM/BETA-PHASE/tune_beta_alpha
+    #finite_model._site_energies[10]=finite_model._site_energies[10]-0.01
+ 
 
 pl.subplot(413)
 pl.plot(energies)
@@ -128,35 +131,10 @@ pl.plot(energies)
 #Top Subplot
 pl.plot(evals)
 
-
-#Bottom Subplot
-#pl.subplot(212)
-#pl.ylim(-1.,1.)
-#pl.plot(eigs[0])
-#pl.plot(eigs[0]*eigs[0])
-#pl.plot(finite_model._site_energies)
-#print("Eigenvectors, first band, orbital"),eigs[0,:]
-
+#For some reason this finally holds the window open
 pl.show()
-#pl.savefig("beta.pdf")
 
-
-#fig=pl.figure()
-#ax=fig.add_subplot(111)
-#x=evals
-#line,=ax.plot(x,eigs[0]*eigs[0])
-#def animate(i):
-#    finite_model._site_energies[10]=finite_model._site_energies[10]-0.01
-#    (evals,eigs)=finite_model.solve_all(eig_vectors=True)
-#    print finite_model._site_energies[10],evals[0]
-#    line.set_ydata(eigs[0]*eigs[0])
-#    return line,
-#def init():
-#    line.set_ydata(np.ma.array(x,mask=True))
-#    return line,
-#ani = animation.FuncAnimation(fig, animate, np.arange(1, 200), init_func=init, interval=25, blit=True)
-#pl.show()
-
-#print("Eigenvectors, Finite model"),eigs
-
-
+print "Saving figures...(one moment please)"
+now=datetime.datetime.now().strftime("%Y-%m-%d-%H:%M")
+fig.savefig("%s-BetaPhasePyTB.pdf"%now)
+fig.savefig("%s-BetaPhasePyTB.png"%now)
