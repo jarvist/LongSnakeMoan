@@ -21,7 +21,7 @@ pl.ion()
 # J     = electron hopping integral
 siteE=5.853060  #5.853060
 J=0.6 #Maximal hopping integral (inter-torsional theta=0)
-trapE=0.176
+trapE=0.176 #Derived from the DFT calculation on octamers
 siteSigma=0.05 #0.05
 JSigma=0.5 #0.5
 ThetaMin=pi/4 #Pi/4
@@ -152,13 +152,14 @@ for i, colour in zip(range(0,45,b),colours):
 #pl.plot(evals)
 
 #For some reason this finally holds the window open
+## - I don't understand this at all, might be something to do with a dated version of matplotlib on Ubuntu 10.04
 
 print "Lowest Eigenvalues:\n", energies
 
 print "Saving figures...(one moment please)"
-now=datetime.datetime.now().strftime("%Y-%m-%d-%H:%M")
-pl.annotate("JMF %s"%now,xy=(0.75,0.02),xycoords='figure fraction')
-pl.show()
+now=datetime.datetime.now().strftime("%Y-%m-%d-%H:%M") #String of standardised year-leading time
+pl.annotate("JMF %s"%now,xy=(0.75,0.02),xycoords='figure fraction') #Date Stamp in corner
+pl.show() #Show the plot
 
-fig.savefig("%s-BetaPhasePyTB.pdf"%now)
+fig.savefig("%s-BetaPhasePyTB.pdf"%now) #Save figures as both PDF and easy viewing PNG (perfect for talks)
 fig.savefig("%s-BetaPhasePyTB.png"%now)
