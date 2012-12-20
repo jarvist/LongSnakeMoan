@@ -23,7 +23,7 @@ siteE=5.853060  #5.853060
 J=0.6 #Maximal hopping integral (inter-torsional theta=0)
 trapE=0.176 #Derived from the DFT calculation on octamers
 siteSigma=0.05 #0.05
-JSigma=0.5 #0.5
+JSigma=0.1 #0.5
 ThetaMin=pi/4 #Pi/4
 nsites=100
 
@@ -89,8 +89,8 @@ F=0.01 #V/site, roughly equiv. to V/nm.
 
 colours='bgrcmykkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
   # Aaah, we fade to grey (fade to grey)
-b=50
-for i, colour in zip(range(0,45,b),colours):
+b=8 #Width of beta phase segments
+for i, colour in zip(range(40,50,b),colours):
     print "Iterate value i=",i," colour value",colour
     (evals,eigs)=finite_model.solve_all(eig_vectors=True)
     print evals[0]
@@ -99,7 +99,7 @@ for i, colour in zip(range(0,45,b),colours):
     #Plot Eigenvalues with filled-in Eigenvectors^2 / electron probabilities
     pl.subplot(411)
     for j in range(0,5): #Number of eigenvalues plotted (electron wavefns)
-        pl.fill_between(range(100),evals[j],evals[j]+eigs[j]*eigs[j], facecolor=colour)
+        pl.fill_between(range(nsites),evals[j],evals[j]+eigs[j]*eigs[j], facecolor=colour)
     pl.ylabel("Occ %")
     #pl.ylim((3.8,5.0))
     pl.yticks(fontsize=9)
@@ -107,7 +107,7 @@ for i, colour in zip(range(0,45,b),colours):
     #Plot Hamiltonian
     pl.subplot(412)
     #pl.ylim((5.5,6.0))
-    pl.ylabel("Hamiltonian\n(eV)")
+    pl.ylabel("SiteE (eV)")
     pl.yticks(fontsize=9)
 
     pl.plot(finite_model._site_energies,color=colour)
@@ -155,6 +155,7 @@ for i, colour in zip(range(0,45,b),colours):
 ## - I don't understand this at all, might be something to do with a dated version of matplotlib on Ubuntu 10.04
 
 print "Lowest Eigenvalues:\n", energies
+print "Trap Depth:",energies[0]-energies[1]
 
 print "Saving figures...(one moment please)"
 now=datetime.datetime.now().strftime("%Y-%m-%d-%H:%M") #String of standardised year-leading time
