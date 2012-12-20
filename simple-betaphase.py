@@ -26,6 +26,7 @@ siteSigma=0.05 #0.05
 JSigma=0.1 #0.5
 ThetaMin=pi/4 #Pi/4
 nsites=100
+DoS=[]
 
 # specify model
 # Define Lattice Vectors
@@ -72,7 +73,7 @@ print("Eigenvalues, Finite model"),evals
 #Initialise our figures...
 fig=pl.figure()
 
-pl.subplot(411)
+pl.subplot(511)
 pl.title("Beta-PFO 1D pyTB - Disordered\nSigma=%s JSigma=%s"%(siteSigma,JSigma))
 
 energies=[]
@@ -92,12 +93,29 @@ colours='bgrcmykkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
 b=8 #Width of beta phase segments
 for i, colour in zip(range(40,50,b),colours):
     print "Iterate value i=",i," colour value",colour
-    (evals,eigs)=finite_model.solve_all(eig_vectors=True)
+
+
+    for a in range(1000):
+        print "B",
+        for k in range(nsites-1):
+            finite_model._site_energies[k]=siteE+random.gauss(0,siteSigma)
+            finite_model._hoppings[k][0]=J*(cos(random.gauss(ThetaMin,JSigma))**2) #random around 45 degrees
+
+        if (i==48):
+            for j in range(i,i+b): #filthy
+#            finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
+                finite_model._hoppings[j][0]=J #Perfect transfer integrals
+
+        (evals,eigs)=finite_model.solve_all(eig_vectors=True)
+
+        DoS.append(zip(evals))
+
     print evals[0]
+    print DoS
     energies.append(evals[0]) #log of first eigenvalues
 
     #Plot Eigenvalues with filled-in Eigenvectors^2 / electron probabilities
-    pl.subplot(411)
+    pl.subplot(511)
     for j in range(0,5): #Number of eigenvalues plotted (electron wavefns)
         pl.fill_between(range(nsites),evals[j],evals[j]+eigs[j]*eigs[j], facecolor=colour)
     pl.ylabel("Occ %")
@@ -105,7 +123,7 @@ for i, colour in zip(range(40,50,b),colours):
     pl.yticks(fontsize=9)
 
     #Plot Hamiltonian
-    pl.subplot(412)
+    pl.subplot(512)
     #pl.ylim((5.5,6.0))
     pl.ylabel("SiteE (eV)")
     pl.yticks(fontsize=9)
@@ -113,7 +131,7 @@ for i, colour in zip(range(40,50,b),colours):
     pl.plot(finite_model._site_energies,color=colour)
 
     #Plot Eigenvalues - not sure how useful this display is
-    pl.subplot(413)
+    pl.subplot(513)
    # pl.ylim((0.0,1.0))
     pl.yticks(fontsize=9)
 
@@ -124,13 +142,17 @@ for i, colour in zip(range(40,50,b),colours):
 #    pl.plot(evals,color=colour)
 
     #Plot DoS
-    pl.subplot(414)
+    if (i==48): #Disgusting, I know
+        pl.subplot(515)
+    else:
+        pl.subplot(514)
     pl.ylabel("DoS (#, eV)")
     pl.yticks(fontsize=9)
     pl.xlabel("Tight Binding Site (#) / DoS Histogram (eV)") #xLabel for shared axes
 
     # Histogram of TB Eigenvalues (i.e. DoS)
     pl.hist(evals,50,color=colour)
+    pl.hist(DoS,500,color=colour)
     # Histogram of Hopping Integrals (funky zip command to rearrange J magnitude into 1D vector)
 #    pl.hist(zip(*finite_model._hoppings)[0],50,color=colour)
 
