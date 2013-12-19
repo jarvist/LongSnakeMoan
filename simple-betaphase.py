@@ -22,9 +22,9 @@ pl.ion()
 siteE=5.853060  #5.853060
 J=0.6 #Maximal hopping integral (inter-torsional theta=0)
 trapE=0.176 #Derived from the DFT calculation on octamers
-siteSigma=0.05 #0.05
-JSigma=0.1 #0.5
-ThetaMin=pi/4 #Pi/4
+siteSigma=0.05#  #0.05
+JSigma=0.1 #0.1 #0.5
+ThetaMin=pi/4 #pi/4 #Pi/4
 nsites=100
 DoS=[]
 
@@ -90,16 +90,20 @@ F=0.01 #V/site, roughly equiv. to V/nm.
 
 colours='bgrcmykkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
   # Aaah, we fade to grey (fade to grey)
-b=8 #Width of beta phase segments
-for i, colour in zip(range(40,50,b),colours):
+b=6 #Width of beta phase segments
+for i, colour in zip(range(42,50,b),colours):
     print "Iterate value i=",i," colour value",colour
 
 
-    for a in range(1000):
+#    DoS.append([[4.50]]) # nasty hack to get Beta + alpha phase DoS to plot with same x-axes
+#    DoS.append([[7.5]])   #  ^- which does not work...
+#    print DoS
+
+    for a in range(100):
         print "B",
         for k in range(nsites-1):
             finite_model._site_energies[k]=siteE+random.gauss(0,siteSigma)
-            finite_model._hoppings[k][0]=J*(cos(random.gauss(ThetaMin,JSigma))**2) #random around 45 degrees
+            finite_model._hoppings[k][0]=J*(cos(random.gauss(ThetaMin,JSigma))**2) #random around Theta Min
 
         if (i==48):
             for j in range(i,i+b): #filthy
