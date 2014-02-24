@@ -35,6 +35,8 @@ siteSigma=0.05#  #0.05
 JSigma=0.1 #0.1 #0.5
 ThetaMin=pi/4 #pi/4 #Pi/4
 nsites=100
+DoS_averages=1000
+
 DoS=[]
 
 # specify model
@@ -96,18 +98,20 @@ F=0.01 #V/site, roughly equiv. to V/nm.
 #for i in range(1,100):
 #    finite_model._site_energies[i]=finite_model._site_energies[i]-(i*F)
 
-colours='bgrcmykkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
+DoS.extend([4.50]) # nasty hack to get Beta + alpha phase DoS to plot with same x-axes
+DoS.extend([7.5])   #  ^- which does doesn't work (on old MatPlotLib)...
+
+colours='bgrcmyikkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
   # Aaah, we fade to grey (fade to grey)
 b=6 #Width of beta phase segments
-for i, colour in zip(range(42,50,b),colours):
+for i, colour in zip(range(42,50,b),colours): #I'm ashamed of this nasty hack. JMF
     print "Iterate value i=",i," colour value",colour
 
 
-#    DoS.append([[4.50]]) # nasty hack to get Beta + alpha phase DoS to plot with same x-axes
-#    DoS.append([[7.5]])   #  ^- which does not work...
-#    print DoS
 
-    for a in range(1000):
+    print DoS
+
+    for a in range(DoS_averages):
         print "DoS average ",a
         for k in range(nsites-1):
             finite_model._site_energies[k]=siteE+random.gauss(0,siteSigma)
@@ -165,7 +169,7 @@ for i, colour in zip(range(42,50,b),colours):
     pl.yticks(fontsize=9)
     pl.xlabel("Tight Binding Site (#) / DoS Histogram (eV)") #xLabel for shared axes
 
-    embed() #iPython interactive session - squash some bugs!
+    #embed() #iPython interactive session - squash some bugs!
 
     # Histogram of TB Eigenvalues (i.e. DoS)
     pl.hist(evals,50 ,color=colour)  # Colour broken with OS X matplotlib - complains about number of colours vs. number of data in set
@@ -194,7 +198,7 @@ for i, colour in zip(range(42,50,b),colours):
 ## - I don't understand this at all, might be something to do with a dated version of matplotlib on Ubuntu 10.04
 
 print "Lowest Eigenvalues:\n", energies
-print "Trap Depth:",energies[0]-energies[1]
+print "Trap Depth (Eigen0-Eigen1):",energies[0]-energies[1]
 
 print "Saving figures...(one moment please)"
 now=datetime.datetime.now().strftime("%Y-%m-%d-%H:%M") #String of standardised year-leading time
