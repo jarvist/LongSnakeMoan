@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
-# Version 1.5
-# one dimensional chain
+# Long Snake Moan
+#  - a Python Tighbinding simulation of torsionally disordered conjugated polymer in vacuum
 
-# Copyright under GNU General Public License 2010, 2012
-# by Sinisa Coh and David Vanderbilt (see gpl-pytb.txt)
+#Originally:
+## Version 1.5 - originally pyTB example 'one dimensional chain'
+## Copyright under GNU General Public License 2010, 2012
+## by Sinisa Coh and David Vanderbilt (see gpl-pytb.txt)
 
 from pytb import * # import TB model class
 import pylab as pl
