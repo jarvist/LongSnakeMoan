@@ -98,18 +98,15 @@ F=0.01 #V/site, roughly equiv. to V/nm.
 #for i in range(1,100):
 #    finite_model._site_energies[i]=finite_model._site_energies[i]-(i*F)
 
-DoS.extend([4.50]) # nasty hack to get Beta + alpha phase DoS to plot with same x-axes
-DoS.extend([7.5])   #  ^- which does doesn't work (on old MatPlotLib)...
-
 colours='bgrcmyikkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
   # Aaah, we fade to grey (fade to grey)
 b=6 #Width of beta phase segments
 for i, colour in zip(range(42,50,b),colours): #I'm ashamed of this nasty hack. JMF
     print "Iterate value i=",i," colour value",colour
 
-
-
-    print DoS
+    DoS.extend([4.50]) # nasty hack to get Beta + alpha phase DoS to plot with same x-axes
+    DoS.extend([7.5])   #  ^- which does doesn't work (on old MatPlotLib)...
+#    print DoS
 
     for a in range(DoS_averages):
         print "DoS average ",a
