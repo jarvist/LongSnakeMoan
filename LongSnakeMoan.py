@@ -2,14 +2,17 @@
 
 # Long Snake Moan
 #  - a Python Tighbinding simulation of torsionally disordered conjugated polymer in vacuum
+# Jarvist Moore Frost 2012-2014
 
 #Originally:
 ## Version 1.5 - originally pyTB example 'one dimensional chain'
 ## Copyright under GNU General Public License 2010, 2012
 ## by Sinisa Coh and David Vanderbilt (see gpl-pytb.txt)
 
-from pytb import * # import TB model class
-import pylab as pl
+from pythtb import * # import TB model class --> now pythtb 1.6.2 version
+
+import matplotlib.pyplot as pl
+
 import random
 import datetime
 from math import *
@@ -70,13 +73,12 @@ finite_model.display()
 
 # start outputting useful info
 
-
 print("Eigenvalues, Finite model"),evals
 #Initialise our figures...
 fig=pl.figure()
 
 pl.subplot(511)
-pl.title("Beta-PFO 1D pyTB - Disordered\nSigma=%s JSigma=%s"%(siteSigma,JSigma))
+pl.title("LongSnakeMoan - Disordered\nSigma=%s JSigma=%s"%(siteSigma,JSigma))
 
 energies=[]
 
@@ -101,8 +103,8 @@ for i, colour in zip(range(42,50,b),colours):
 #    DoS.append([[7.5]])   #  ^- which does not work...
 #    print DoS
 
-    for a in range(100):
-        print "B",
+    for a in range(1000):
+        print "DoS average ",a
         for k in range(nsites-1):
             finite_model._site_energies[k]=siteE+random.gauss(0,siteSigma)
             finite_model._hoppings[k][0]=J*(cos(random.gauss(ThetaMin,JSigma))**2) #random around Theta Min
@@ -112,12 +114,14 @@ for i, colour in zip(range(42,50,b),colours):
 #            finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
                 finite_model._hoppings[j][0]=J #Perfect transfer integrals
 
-        (evals,eigs)=finite_model.solve_all(eig_vectors=True)
+        evals=finite_model.solve_all(eig_vectors=False) # only DoS here please
+        #NB: internally pythtb just uses 'eigvalsh' which is the standard Hermition solver
+        # there is also scipy.sparse.linalg.eigsh which may be sig. faster
 
         DoS.append(zip(evals))
 
-    print evals[0]
-    print DoS
+    #print evals[0]
+    #print DoS
     energies.append(evals[0]) #log of first eigenvalues
 
     #Plot Eigenvalues with filled-in Eigenvectors^2 / electron probabilities
@@ -157,12 +161,12 @@ for i, colour in zip(range(42,50,b),colours):
     pl.xlabel("Tight Binding Site (#) / DoS Histogram (eV)") #xLabel for shared axes
 
     # Histogram of TB Eigenvalues (i.e. DoS)
-    pl.hist(evals,50,color=colour)
-    pl.hist(DoS,500,color=colour)
+    pl.hist(evals,50) #,color=colour)  # Colour broken with matplotlib - complains about number of colours vs. number of data in set
+    pl.hist(DoS,500) #,color=colour)
     # Histogram of Hopping Integrals (funky zip command to rearrange J magnitude into 1D vector)
 #    pl.hist(zip(*finite_model._hoppings)[0],50,color=colour)
 
-    pl.draw()
+    #pl.draw()
 
     # Modifies the 'Beta Bubble' region of the Hamiltonian
     for j in range(i,i+b): #filthy
@@ -190,5 +194,5 @@ now=datetime.datetime.now().strftime("%Y-%m-%d-%H:%M") #String of standardised y
 pl.annotate("JMF %s"%now,xy=(0.75,0.02),xycoords='figure fraction') #Date Stamp in corner
 pl.show() #Show the plot
 
-fig.savefig("%s-BetaPhasePyTB.pdf"%now) #Save figures as both PDF and easy viewing PNG (perfect for talks)
-fig.savefig("%s-BetaPhasePyTB.png"%now)
+fig.savefig("%s-LongSnakeMoan.pdf"%now) #Save figures as both PDF and easy viewing PNG (perfect for talks)
+fig.savefig("%s-LongSnakeMoan.png"%now)
