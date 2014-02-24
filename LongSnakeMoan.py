@@ -9,6 +9,10 @@
 ## Copyright under GNU General Public License 2010, 2012
 ## by Sinisa Coh and David Vanderbilt (see gpl-pytb.txt)
 
+from IPython import embed# we do this so we can drop to interactive python for debugging. 
+ # Major python coolio
+ # --> embed() <-- TA DA!
+
 from pythtb import * # import TB model class --> now pythtb 1.6.2 version
 
 import matplotlib.pyplot as pl
@@ -118,7 +122,8 @@ for i, colour in zip(range(42,50,b),colours):
         #NB: internally pythtb just uses 'eigvalsh' which is the standard Hermition solver
         # there is also scipy.sparse.linalg.eigsh which may be sig. faster
 
-        DoS.append(zip(evals))
+        #DoS.append(zip(evals))
+        DoS.extend(list(evals))
 
     #print evals[0]
     #print DoS
@@ -160,9 +165,11 @@ for i, colour in zip(range(42,50,b),colours):
     pl.yticks(fontsize=9)
     pl.xlabel("Tight Binding Site (#) / DoS Histogram (eV)") #xLabel for shared axes
 
+    embed() #iPython interactive session - squash some bugs!
+
     # Histogram of TB Eigenvalues (i.e. DoS)
-    pl.hist(evals,50) #,color=colour)  # Colour broken with matplotlib - complains about number of colours vs. number of data in set
-    pl.hist(DoS,500) #,color=colour)
+    pl.hist(evals,50 ,color=colour)  # Colour broken with OS X matplotlib - complains about number of colours vs. number of data in set
+    pl.hist(DoS,500 ,color=colour)
     # Histogram of Hopping Integrals (funky zip command to rearrange J magnitude into 1D vector)
 #    pl.hist(zip(*finite_model._hoppings)[0],50,color=colour)
 
