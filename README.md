@@ -11,4 +11,4 @@ https://speakerdeck.com/jarvist/beta-phase
 
 The code should produce live plots like this:
 
-!(2012-10-25-13h03-BetaPhasePyTB.png)
+![Screenshot](https://raw.github.com/jarvist/LongSnakeMoan/master/2012-10-25-13h03-BetaPhasePyTB.png)
