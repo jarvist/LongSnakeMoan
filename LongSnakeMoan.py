@@ -21,6 +21,15 @@ import random
 import datetime
 from math import *
 
+#Pretty colours; via http://blog.olgabotvinnik.com/post/58941062205/prettyplotlib-painlessly-create-beautiful-matplotlib
+import brewer2mpl #'pip install brewer2mpl'
+# Get "Set2" colors from ColorBrewer (all colorbrewer scales: http://bl.ocks.org/mbostock/5577023)
+colours = brewer2mpl.get_map('Set2', 'qualitative', 8).mpl_colors
+
+#Otherwise, boring built in ones...
+#colours='brgcmkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
+# Aaah, we fade to grey (fade to grey)
+
 pl.ion()
 
 #print random.gauss(0,0.1)
@@ -105,10 +114,8 @@ def edit_hamiltonian(J0, ThetaMin, JSigma, siteE, siteSigma, BetaSegment):
             finite_model._hoppings[j][0]=J0 #Perfect transfer integrals
 
 
-colours='bgrcmyikkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
-  # Aaah, we fade to grey (fade to grey)
 b=6 #Width of beta phase segments
-for i, colour in zip(range(42,50,b),colours): #I'm ashamed of this nasty hack. JMF
+for i, colour in zip([0,8],colours): #I'm ashamed of this nasty hack. JMF
     # this means you step over the iterator value, and have a different colour plot for each loop
     print "Iterate value i=",i," colour value",colour
 
@@ -118,7 +125,7 @@ for i, colour in zip(range(42,50,b),colours): #I'm ashamed of this nasty hack. J
 
     for a in range(DoS_averages):
         print "DoS average ",a
-        edit_hamiltonian(J0,ThetaMin,JSigma,siteE,siteSigma,0)
+        edit_hamiltonian(J0,ThetaMin,JSigma,siteE,siteSigma,i)
 #        for k in range(nsites-1):
 #            finite_model._site_energies[k]=siteE+random.gauss(0,siteSigma)
 #            finite_model._hoppings[k][0]=J0*(cos(random.gauss(ThetaMin,JSigma))**2) #random around Theta Min
@@ -167,7 +174,7 @@ for i, colour in zip(range(42,50,b),colours): #I'm ashamed of this nasty hack. J
 #    pl.plot(evals,color=colour)
 
     #Plot DoS
-    if (i==48): #Disgusting, I know - detects whether this is beta phase region
+    if (i>0): # this is no beta phase region
         pl.subplot(515)
     else:
         pl.subplot(514)
@@ -177,22 +184,14 @@ for i, colour in zip(range(42,50,b),colours): #I'm ashamed of this nasty hack. J
 
     #embed() #iPython interactive session - squash some bugs!
 
+    print "Colour: ", colour
     # Histogram of TB Eigenvalues (i.e. DoS)
-    pl.hist(evals,50 ,color=colour)  # Colour broken with OS X matplotlib - complains about number of colours vs. number of data in set
-    pl.hist(DoS,500 ,color=colour)
+    pl.hist(evals,50,color=colour)  # Colour broken with OS X matplotlib - complains about number of colours vs. number of data in set
+    pl.hist(DoS,500,histtype='stepfilled',color=colour)
     # Histogram of Hopping Integrals (funky zip command to rearrange J magnitude into 1D vector)
 #    pl.hist(zip(*finite_model._hoppings)[0],50,color=colour)
-
-    #pl.draw()
-
-    # Modifies the 'Beta Bubble' region of the Hamiltonian
-    for j in range(i,i+b): #filthy
-#        finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
-        finite_model._hoppings[j][0]=J0 #Perfect transfer integrals
-    #    finite_model._hoppings[j][0]=finite_model._hoppings[j][0]-0.3 #i.e. in addition to any disorder
-    # See: /work/jmf02/NWCHEM/BETA-PHASE/tune_beta_alpha
-    #finite_model._site_energies[10]=finite_model._site_energies[10]-0.01
- 
+    
+    DoS=[]
 
 #pl.subplot(413)
 #pl.plot(energies)
