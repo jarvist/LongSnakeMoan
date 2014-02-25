@@ -29,7 +29,7 @@ pl.ion()
 # SiteE = Ionisation Potential
 # J     = electron hopping integral
 siteE=5.853060  #5.853060
-J=0.6 #Maximal hopping integral (inter-torsional theta=0)
+J0=0.6 #Maximal hopping integral (inter-torsional theta=0)
 trapE=0.176 #Derived from the DFT calculation on octamers
 siteSigma=0.05#  #0.05
 JSigma=0.1 #0.1 #0.5
@@ -49,7 +49,7 @@ my_model=tbmodel(1,1,lat,orb)
 # set on-site energies
 my_model.set_sites([siteE])
 # constant J hop between sites (tridiagonal density matrix)
-my_model.add_hop(J, 0, 0, [1])
+my_model.add_hop(J0, 0, 0, [1])
 # Show me please
 my_model.display()
 
@@ -94,6 +94,17 @@ energies=[]
 #for i in range(1,100):
 #    finite_model._site_energies[i]=finite_model._site_energies[i]-(i*F)
 
+
+def edit_hamiltonian(J0, ThetaMin, JSigma, siteE, siteSigma, BetaSegment):
+    for k in range(nsites-1):
+        finite_model._site_energies[k]=siteE+random.gauss(0,siteSigma)
+        finite_model._hoppings[k][0]=J0*(cos(random.gauss(ThetaMin,JSigma))**2) #random around Theta Min
+    if (BetaSegment>0):
+        for j in range(i-BetaSegment/2,i+BetaSegment/2): #filthy
+#        finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
+            finite_model._hoppings[j][0]=J0 #Perfect transfer integrals
+
+
 colours='bgrcmyikkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
   # Aaah, we fade to grey (fade to grey)
 b=6 #Width of beta phase segments
@@ -107,14 +118,15 @@ for i, colour in zip(range(42,50,b),colours): #I'm ashamed of this nasty hack. J
 
     for a in range(DoS_averages):
         print "DoS average ",a
-        for k in range(nsites-1):
-            finite_model._site_energies[k]=siteE+random.gauss(0,siteSigma)
-            finite_model._hoppings[k][0]=J*(cos(random.gauss(ThetaMin,JSigma))**2) #random around Theta Min
+        edit_hamiltonian(J0,ThetaMin,JSigma,siteE,siteSigma,0)
+#        for k in range(nsites-1):
+#            finite_model._site_energies[k]=siteE+random.gauss(0,siteSigma)
+#            finite_model._hoppings[k][0]=J0*(cos(random.gauss(ThetaMin,JSigma))**2) #random around Theta Min
 
-        if (i==48):
-            for j in range(i,i+b): #filthy
+#        if (i==48):
+#            for j in range(i,i+b): #filthy
 #            finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
-                finite_model._hoppings[j][0]=J #Perfect transfer integrals
+#                finite_model._hoppings[j][0]=J0 #Perfect transfer integrals
 
         evals=finite_model.solve_all(eig_vectors=False) # only DoS here please
         #NB: internally pythtb just uses 'eigvalsh' which is the standard Hermition solver
@@ -176,7 +188,7 @@ for i, colour in zip(range(42,50,b),colours): #I'm ashamed of this nasty hack. J
     # Modifies the 'Beta Bubble' region of the Hamiltonian
     for j in range(i,i+b): #filthy
 #        finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
-        finite_model._hoppings[j][0]=J #Perfect transfer integrals
+        finite_model._hoppings[j][0]=J0 #Perfect transfer integrals
     #    finite_model._hoppings[j][0]=finite_model._hoppings[j][0]-0.3 #i.e. in addition to any disorder
     # See: /work/jmf02/NWCHEM/BETA-PHASE/tune_beta_alpha
     #finite_model._site_energies[10]=finite_model._site_energies[10]-0.01
