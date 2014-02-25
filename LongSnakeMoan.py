@@ -109,13 +109,13 @@ def edit_hamiltonian(J0, ThetaMin, JSigma, siteE, siteSigma, BetaSegment):
         finite_model._site_energies[k]=siteE+random.gauss(0,siteSigma)
         finite_model._hoppings[k][0]=J0*(cos(random.gauss(ThetaMin,JSigma))**2) #random around Theta Min
     if (BetaSegment>0):
-        for j in range(i-BetaSegment/2,i+BetaSegment/2): #filthy
+        for j in range(nsites/2-BetaSegment/2,nsites/2+BetaSegment/2): #filthy
 #        finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
             finite_model._hoppings[j][0]=J0 #Perfect transfer integrals
 
 
 b=6 #Width of beta phase segments
-for i, colour in zip([0,8],colours): #I'm ashamed of this nasty hack. JMF
+for i, colour in zip([0,2,4,8],colours): #I'm ashamed of this nasty hack. JMF
     # this means you step over the iterator value, and have a different colour plot for each loop
     print "Iterate value i=",i," colour value",colour
 
