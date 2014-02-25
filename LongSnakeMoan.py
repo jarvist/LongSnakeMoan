@@ -39,26 +39,25 @@ DoS_averages=1000
 
 DoS=[]
 
-# specify model
+# SPECIFY MODEL
 # Define Lattice Vectors
 lat=[[1.0]]
 # Define coordinates of orbitals
 orb=[[0.0]]
 #1D model please (k,r)
 my_model=tbmodel(1,1,lat,orb)
-
 # set on-site energies
 my_model.set_sites([siteE])
-
+# constant J hop between sites (tridiagonal density matrix)
 my_model.add_hop(J, 0, 0, [1])
-
+# Show me please
 my_model.display()
 
-# solve model
+# SOLVE MODEL
 # generate k-points
 path=[[-0.5],[0.5]]
 kpts=k_path(path,nsites)
-#print "kpts, ",kpts
+print "kpts, ",kpts
 
 (evals,eigs)=my_model.solve_all(kpts,eig_vectors=True)
 
@@ -80,20 +79,17 @@ finite_model.display()
 # start outputting useful info
 
 print("Eigenvalues, Finite model"),evals
+
 #Initialise our figures...
 fig=pl.figure()
 
-pl.subplot(511)
+pl.subplot(511) #5 subplots stacked on top of one another
 pl.title("LongSnakeMoan - Disordered\nSigma=%s JSigma=%s"%(siteSigma,JSigma))
 
 energies=[]
 
-#for i in range(75,85,1):
-#    finite_model._site_energies[i]=finite_model._site_energies[i]-trapE
-
-F=0.01 #V/site, roughly equiv. to V/nm. 
+#F=0.01 #V/site, roughly equiv. to V/nm. 
 #Thomas K says 1V/100nm is about right for an Organic Solar Cell at Short Circuit
-
 #Apply electric field gradient across model
 #for i in range(1,100):
 #    finite_model._site_energies[i]=finite_model._site_energies[i]-(i*F)
@@ -102,10 +98,11 @@ colours='bgrcmyikkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
   # Aaah, we fade to grey (fade to grey)
 b=6 #Width of beta phase segments
 for i, colour in zip(range(42,50,b),colours): #I'm ashamed of this nasty hack. JMF
+    # this means you step over the iterator value, and have a different colour plot for each loop
     print "Iterate value i=",i," colour value",colour
 
     DoS.extend([4.50]) # nasty hack to get Beta + alpha phase DoS to plot with same x-axes
-    DoS.extend([7.5])   #  ^- which does doesn't work (on old MatPlotLib)...
+    DoS.extend([7.5])   #  ^- which doesn't work on old MatPlotLib...
 #    print DoS
 
     for a in range(DoS_averages):
@@ -158,7 +155,7 @@ for i, colour in zip(range(42,50,b),colours): #I'm ashamed of this nasty hack. J
 #    pl.plot(evals,color=colour)
 
     #Plot DoS
-    if (i==48): #Disgusting, I know
+    if (i==48): #Disgusting, I know - detects whether this is beta phase region
         pl.subplot(515)
     else:
         pl.subplot(514)
