@@ -206,7 +206,7 @@ for i, colour in zip(betas,colours): #I'm ashamed of this nasty hack. JMF
 ## - I don't understand this at all, might be something to do with a dated version of matplotlib on Ubuntu 10.04
 
 print "Lowest Eigenvalues:\n", energies
-print "Trap Depth (Min - max):",energies[0]-energies[:1]
+print "Trap Depth (Min - max):",energies[0]-energies[-1]
 
 print "Saving figures...(one moment please)"
 now=datetime.datetime.now().strftime("%Y-%m-%d-%H:%M") #String of standardised year-leading time
