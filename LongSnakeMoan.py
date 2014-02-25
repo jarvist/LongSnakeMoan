@@ -40,11 +40,11 @@ pl.ion()
 siteE=5.853060  #5.853060
 J0=0.6 #Maximal hopping integral (inter-torsional theta=0)
 trapE=0.176 #Derived from the DFT calculation on octamers
-siteSigma=0.05#  #0.05
-JSigma=0.1 #0.1 #0.5
+siteSigma=0.05
+JSigma=0.1 #0.5
 ThetaMin=pi/4 #pi/4 #Pi/4
 nsites=100
-DoS_averages=1000
+DoS_averages=100
 
 DoS=[]
 
@@ -114,8 +114,8 @@ def edit_hamiltonian(J0, ThetaMin, JSigma, siteE, siteSigma, BetaSegment):
             finite_model._hoppings[j][0]=J0 #Perfect transfer integrals
 
 
-b=6 #Width of beta phase segments
-for i, colour in zip([0,2,4,8],colours): #I'm ashamed of this nasty hack. JMF
+betas=[0,8] # ,2,4,6,8] #Width of beta phase segments
+for i, colour in zip(betas,colours): #I'm ashamed of this nasty hack. JMF
     # this means you step over the iterator value, and have a different colour plot for each loop
     print "Iterate value i=",i," colour value",colour
 
@@ -142,6 +142,9 @@ for i, colour in zip([0,2,4,8],colours): #I'm ashamed of this nasty hack. JMF
         #DoS.append(zip(evals))
         DoS.extend(list(evals))
 
+    #Just one sample of eigenvectors + eigenvalues for plotting wave functions
+    (evals,eigs)=finite_model.solve_all(eig_vectors=True)
+   
     #print evals[0]
     #print DoS
     energies.append(evals[0]) #log of first eigenvalues
@@ -174,10 +177,10 @@ for i, colour in zip([0,2,4,8],colours): #I'm ashamed of this nasty hack. JMF
 #    pl.plot(evals,color=colour)
 
     #Plot DoS
-    if (i>0): # this is no beta phase region
+    if (i>0): # this is a beta phase region .'. 5th plot
         pl.subplot(515)
     else:
-        pl.subplot(514)
+        pl.subplot(514) # non-beta-phase on the 4th plot
     pl.ylabel("DoS (#, eV)")
     pl.yticks(fontsize=9)
     pl.xlabel("Tight Binding Site (#) / DoS Histogram (eV)") #xLabel for shared axes
@@ -186,7 +189,7 @@ for i, colour in zip([0,2,4,8],colours): #I'm ashamed of this nasty hack. JMF
 
     print "Colour: ", colour
     # Histogram of TB Eigenvalues (i.e. DoS)
-    pl.hist(evals,50,color=colour)  # Colour broken with OS X matplotlib - complains about number of colours vs. number of data in set
+    #pl.hist(evals,50,color=colour)  # Colour broken with OS X matplotlib - complains about number of colours vs. number of data in set
     pl.hist(DoS,500,histtype='stepfilled',color=colour)
     # Histogram of Hopping Integrals (funky zip command to rearrange J magnitude into 1D vector)
 #    pl.hist(zip(*finite_model._hoppings)[0],50,color=colour)
@@ -203,7 +206,7 @@ for i, colour in zip([0,2,4,8],colours): #I'm ashamed of this nasty hack. JMF
 ## - I don't understand this at all, might be something to do with a dated version of matplotlib on Ubuntu 10.04
 
 print "Lowest Eigenvalues:\n", energies
-print "Trap Depth (Eigen0-Eigen1):",energies[0]-energies[1]
+print "Trap Depth (Min - max):",energies[0]-energies[:1]
 
 print "Saving figures...(one moment please)"
 now=datetime.datetime.now().strftime("%Y-%m-%d-%H:%M") #String of standardised year-leading time
