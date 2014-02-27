@@ -22,13 +22,14 @@ import datetime
 from math import *
 
 #Pretty colours; via http://blog.olgabotvinnik.com/post/58941062205/prettyplotlib-painlessly-create-beautiful-matplotlib
-import brewer2mpl #'pip install brewer2mpl'
+try:
+    import brewer2mpl #'pip install brewer2mpl'
 # Get "Set2" colors from ColorBrewer (all colorbrewer scales: http://bl.ocks.org/mbostock/5577023)
-colours = brewer2mpl.get_map('Set2', 'qualitative', 8).mpl_colors
-
-#Otherwise, boring built in ones...
-#colours='brgcmkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
-# Aaah, we fade to grey (fade to grey)
+    colours = brewer2mpl.get_map('Set2', 'qualitative', 8).mpl_colors
+except ImportError: #If no brewer2mpl library
+    #Otherwise, boring built in ones...
+    colours='brgcmkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk' # Aaah, we fade to grey (fade to grey)
+    print "Hey - no brew2mpl. Thus a simple palette."
 
 # Matplotlib setup for publication quality figures...
 pl.ion()
