@@ -30,7 +30,19 @@ colours = brewer2mpl.get_map('Set2', 'qualitative', 8).mpl_colors
 #colours='brgcmkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk'
 # Aaah, we fade to grey (fade to grey)
 
+# Matplotlib setup for publication quality figures...
 pl.ion()
+
+fig_size=[240.7/72, 240.7/72] #square aspect ratio, size of Latex 2 column width
+params = {'backend': 'ps',
+           'axes.labelsize': 9,
+           'text.fontsize': 9,
+           'legend.fontsize': 9,
+           'xtick.labelsize': 8,
+           'ytick.labelsize': 8,
+           'text.usetex': True,
+           'figure.figsize': fig_size}
+#pl.rcParams.update(params)
 
 #print random.gauss(0,0.1)
 
@@ -91,6 +103,7 @@ print("Eigenvalues, Finite model"),evals
 
 #Initialise our figures...
 fig=pl.figure()
+pl.axes().set_aspect('equal')
 
 pl.subplot(511) #5 subplots stacked on top of one another
 pl.title("LongSnakeMoan - Disordered\nSigma=%s JSigma=%s"%(siteSigma,JSigma))
