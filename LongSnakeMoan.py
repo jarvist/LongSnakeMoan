@@ -131,39 +131,26 @@ def edit_hamiltonian(J0, ThetaMin, JSigma, siteE, siteSigma, BetaSegment):
 
 
 betas=[0,8] # ,2,4,6,8] #Width of beta phase segments
-for i, colour in zip(betas,colours): #I'm ashamed of this nasty hack. JMF
+for betasegments, colour in zip(betas,colours): #I'm ashamed of this nasty hack. JMF
     # this means you step over the iterator value, and have a different colour plot for each loop
-    print "Iterate value i=",i," colour value",colour
+    print "Iterate value betasegments=",betasegments," colour value",colour
 
     DoS.extend([4.50]) # nasty hack to get Beta + alpha phase DoS to plot with same x-axes
     DoS.extend([7.5])   #  ^- which doesn't work on old MatPlotLib...
-#    print DoS
+#    print DoS  # Nb: very verbose - all eigenvalues
 
     for a in range(DoS_averages):
         print "DoS average ",a
-        edit_hamiltonian(J0,ThetaMin,JSigma,siteE,siteSigma,i)
-#        for k in range(nsites-1):
-#            finite_model._site_energies[k]=siteE+random.gauss(0,siteSigma)
-#            finite_model._hoppings[k][0]=J0*(cos(random.gauss(ThetaMin,JSigma))**2) #random around Theta Min
-
-#        if (i==48):
-#            for j in range(i,i+b): #filthy
-#            finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
-#                finite_model._hoppings[j][0]=J0 #Perfect transfer integrals
-
+        edit_hamiltonian(J0,ThetaMin,JSigma,siteE,siteSigma,betasegments)
         evals=finite_model.solve_all(eig_vectors=False) # only DoS here please
         #NB: internally pythtb just uses 'eigvalsh' which is the standard Hermition solver
         # there is also scipy.sparse.linalg.eigsh which may be sig. faster
-
-        #DoS.append(zip(evals))
         DoS.extend(list(evals))
 
     #Just one sample of eigenvectors + eigenvalues for plotting wave functions
     (evals,eigs)=finite_model.solve_all(eig_vectors=True)
    
-    #print evals[0]
-    #print DoS
-    energies.append(evals[0]) #log of first eigenvalues
+    energies.append(evals[0]) #log of first eigenvalues; for trap-depth calculation
 
     #Plot Eigenvalues with filled-in Eigenvectors^2 / electron probabilities
     pl.subplot(511)
@@ -196,7 +183,7 @@ for i, colour in zip(betas,colours): #I'm ashamed of this nasty hack. JMF
 #    pl.plot(evals,color=colour)
 
     #Plot DoS
-    if (i>0): # this is a beta phase region .'. 5th plot
+    if (betasegments>0): # this is a beta phase region .'. 5th plot
         pl.subplot(515,sharex=ax2) #Nb: order matters to share axis...
         pl.xlabel("Eigenvalue (eV)")
     else:
@@ -217,11 +204,7 @@ for i, colour in zip(betas,colours): #I'm ashamed of this nasty hack. JMF
     
     DoS=[]
 
-#pl.subplot(413)
-#pl.plot(energies)
-
-#Top Subplot
-#pl.plot(evals)
+# OK; wrap up time! Save those plots
 
 pl.tight_layout(pad=0.3) #, w_pad=0.5, h_pad=1.0) # Magic incantation for non-terrible plots
 pl.show()
