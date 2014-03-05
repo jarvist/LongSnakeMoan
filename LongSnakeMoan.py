@@ -49,6 +49,7 @@ params = {'backend': 'ps',
 print "'You ought to hear my Long Snake Moan' ~ PJ Harvey"
 #print random.gauss(0,0.1)
 
+# Model setup...
 # Huckel type molecule...
 # SiteE = Ionisation Potential
 # J     = electron hopping integral
@@ -59,7 +60,10 @@ siteSigma=0.05
 ThetaSigma=0.1 #0.5
 ThetaMin=pi/4 #pi/4 #Pi/4
 nsites=100
+
+#Change data collection / plotting
 DoS_averages=100
+histbins=500
 
 DoS=[]
 
@@ -198,7 +202,7 @@ for betasegments, colour in zip(betas,colours): #I'm ashamed of this nasty hack.
     print "Colour: ", colour
     # Histogram of TB Eigenvalues (i.e. DoS)
     #pl.hist(evals,50,color=colour)  # Colour broken with OS X matplotlib - complains about number of colours vs. number of data in set
-    pl.hist(DoS,500,histtype='stepfilled',color=colour)
+    pl.hist(DoS,histbins,histtype='stepfilled',color=colour)
     # Histogram of Hopping Integrals (funky zip command to rearrange J magnitude into 1D vector)
 #    pl.hist(zip(*finite_model._hoppings)[0],50,color=colour)
     
