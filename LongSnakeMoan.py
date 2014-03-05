@@ -135,6 +135,10 @@ def edit_hamiltonian(J0, ThetaMin, ThetaSigma, siteE, siteSigma, BetaSegment):
 
 
 betas=[0,8] # ,2,4,6,8] #Width of beta phase segments
+
+# TODO: (re)write this as a function, so we can script for some data goodness.
+# ( I'm not going to do this now as I'll make a mess )
+
 for betasegments, colour in zip(betas,colours): #I'm ashamed of this nasty hack. JMF
     # this means you step over the iterator value, and have a different colour plot for each loop
     print "Iterate value betasegments=",betasegments," colour value",colour
