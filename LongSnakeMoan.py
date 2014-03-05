@@ -56,7 +56,7 @@ siteE=5.853060  #5.853060
 J0=0.6 #Maximal hopping integral (inter-torsional theta=0)
 trapE=0.176 #Derived from the DFT calculation on octamers
 siteSigma=0.05
-JSigma=0.1 #0.5
+ThetaSigma=0.1 #0.5
 ThetaMin=pi/4 #pi/4 #Pi/4
 nsites=100
 DoS_averages=100
@@ -93,7 +93,7 @@ print finite_model._hoppings
 
 for i in range(nsites-1):
     finite_model._site_energies[i]=finite_model._site_energies[i]+random.gauss(0,siteSigma)
-    finite_model._hoppings[i][0]=finite_model._hoppings[i][0]*(cos(random.gauss(ThetaMin,JSigma))**2) #random around 45 degrees
+    finite_model._hoppings[i][0]=finite_model._hoppings[i][0]*(cos(random.gauss(ThetaMin,ThetaSigma))**2) #random around 45 degrees
 
 finite_model.display()
 
@@ -109,7 +109,7 @@ fig=pl.figure()
 pl.axes().set_aspect('equal')
 
 ax1=pl.subplot(511) #5 subplots stacked on top of one another
-pl.title("LongSnakeMoan - Disordered\nSigma=%s JSigma=%s"%(siteSigma,JSigma))
+pl.title("LongSnakeMoan - Disordered\nSigma=%s ThetaSigma=%s"%(siteSigma,ThetaSigma))
 
 energies=[]
 
@@ -120,10 +120,10 @@ energies=[]
 #    finite_model._site_energies[i]=finite_model._site_energies[i]-(i*F)
 
 
-def edit_hamiltonian(J0, ThetaMin, JSigma, siteE, siteSigma, BetaSegment):
+def edit_hamiltonian(J0, ThetaMin, ThetaSigma, siteE, siteSigma, BetaSegment):
     for k in range(nsites-1):
         finite_model._site_energies[k]=siteE+random.gauss(0,siteSigma)
-        finite_model._hoppings[k][0]=J0*(cos(random.gauss(ThetaMin,JSigma))**2) #random around Theta Min
+        finite_model._hoppings[k][0]=J0*(cos(random.gauss(ThetaMin,ThetaSigma))**2) #random around Theta Min
     if (BetaSegment>0):
         for j in range(nsites/2-BetaSegment/2,nsites/2+BetaSegment/2): #filthy
 #        finite_model._site_energies[j]=finite_model._site_energies[j]-trapE #From NWCHEM / BNL calc on PFO
@@ -141,7 +141,7 @@ for betasegments, colour in zip(betas,colours): #I'm ashamed of this nasty hack.
 
     for a in range(DoS_averages):
         print "DoS average ",a
-        edit_hamiltonian(J0,ThetaMin,JSigma,siteE,siteSigma,betasegments)
+        edit_hamiltonian(J0,ThetaMin,ThetaSigma,siteE,siteSigma,betasegments)
         evals=finite_model.solve_all(eig_vectors=False) # only DoS here please
         #NB: internally pythtb just uses 'eigvalsh' which is the standard Hermition solver
         # there is also scipy.sparse.linalg.eigsh which may be sig. faster
