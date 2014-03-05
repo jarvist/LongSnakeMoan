@@ -45,6 +45,7 @@ params = {'backend': 'ps',
            'figure.figsize': fig_size}
 #pl.rcParams.update(params)
 
+print "You ought to hear my Long Snake Moan"
 #print random.gauss(0,0.1)
 
 # Huckel type molecule...
@@ -106,7 +107,7 @@ print("Eigenvalues, Finite model"),evals
 fig=pl.figure()
 pl.axes().set_aspect('equal')
 
-pl.subplot(511) #5 subplots stacked on top of one another
+ax1=pl.subplot(511) #5 subplots stacked on top of one another
 pl.title("LongSnakeMoan - Disordered\nSigma=%s JSigma=%s"%(siteSigma,JSigma))
 
 energies=[]
@@ -170,21 +171,24 @@ for i, colour in zip(betas,colours): #I'm ashamed of this nasty hack. JMF
     pl.ylabel("Occ %")
     #pl.ylim((3.8,5.0))
     pl.yticks(fontsize=9)
+    pl.xticks(visible=False)
 
     #Plot Hamiltonian
-    pl.subplot(512)
+    pl.subplot(512, sharex=ax1)
     #pl.ylim((5.5,6.0))
-    pl.ylabel("SiteE (eV)")
+    pl.ylabel("S (eV)")
     pl.yticks(fontsize=9)
+    pl.xticks(visible=False)
 
     pl.plot(finite_model._site_energies,color=colour)
 
     #Plot Eigenvalues - not sure how useful this display is
-    pl.subplot(513)
+    pl.subplot(513,sharex=ax1)
    # pl.ylim((0.0,1.0))
     pl.yticks(fontsize=9)
+    pl.xticks(visible=False)
 
-    pl.ylabel("Js (eV)")
+    pl.ylabel("J (eV)")
     pl.plot(zip(*finite_model._hoppings)[0])
 
 #    pl.ylabel("Eigenvalues\n(eV)")
@@ -192,12 +196,14 @@ for i, colour in zip(betas,colours): #I'm ashamed of this nasty hack. JMF
 
     #Plot DoS
     if (i>0): # this is a beta phase region .'. 5th plot
-        pl.subplot(515)
+        pl.subplot(515,sharex=ax2) #Nb: order matters to share axis...
+        pl.xlabel("Eigenvalue (eV)")
     else:
-        pl.subplot(514) # non-beta-phase on the 4th plot
-    pl.ylabel("DoS (#, eV)")
+        ax2=pl.subplot(514) # non-beta-phase on the 4th plot
+        pl.xticks(visible=False)
+
+    pl.ylabel("DoS")
     pl.yticks(fontsize=9)
-    pl.xlabel("Tight Binding Site (#) / DoS Histogram (eV)") #xLabel for shared axes
 
     #embed() #iPython interactive session - squash some bugs!
 
@@ -216,6 +222,8 @@ for i, colour in zip(betas,colours): #I'm ashamed of this nasty hack. JMF
 #Top Subplot
 #pl.plot(evals)
 
+pl.tight_layout(pad=0.3) #, w_pad=0.5, h_pad=1.0) # Magic incantation for non-terrible plots
+pl.show()
 #For some reason this finally holds the window open
 ## - I don't understand this at all, might be something to do with a dated version of matplotlib on Ubuntu 10.04
 
