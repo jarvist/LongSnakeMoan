@@ -44,8 +44,9 @@ params = {'backend': 'ps',
            'text.usetex': True,
            'figure.figsize': fig_size}
 #pl.rcParams.update(params)
+# ^- This is all currently borked; so don't use it.
 
-print "You ought to hear my Long Snake Moan"
+print "'You ought to hear my Long Snake Moan' ~ PJ Harvey"
 #print random.gauss(0,0.1)
 
 # Huckel type molecule...
