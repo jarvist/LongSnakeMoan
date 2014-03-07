@@ -3,7 +3,7 @@
 
 println("Sturm und Drang: DoS by Sturm sequences")
 
-N=10
+N=10000
 
 function sturm(D,E,sigma)
     n=length(D)
@@ -36,17 +36,22 @@ println("STURM sequence method...")
 sigma=4.5
 while sigma<=5.5
     @printf("%f %f\n", sigma , sturm(D,E,sigma))
-    sigma=sigma+0.1
+    sigma=sigma+0.02
 end
 
-println("Elements...(offdiag^2, diag))");
-println([E;D])
+#println("Elements...(offdiag^2, diag))");
+#println([E;D])
 
-println("Full square matrix H");
+#println("Full square matrix H");
 H=diagm(E.^0.5,-1)+diagm(D)+diagm(E.^0.5,1) #build full matrix from diagonal elements; for comparison
-println(H)
+#println(H)
 
 println("Eigenvalues")
 println(eigvals(H))
 println("Min Eigenvalue")
 println(eigmin(H))
+
+println("I time a single histogram (Es<sigma) point:")
+@time sturm(D,E,5.0)
+println("I time eigvals(H)")
+@time eigvals(H)
