@@ -1,10 +1,15 @@
 # Julia code to calculate spectrum of tridiagonal 'DoS' TB matrices with Sturm sequences
 # See section 5, p38: http://arxiv.org/pdf/math-ph/0510043v2.pdf
 
+#using Roots, Polynomial
+
 println("Sturm und Drang: DoS by Sturm sequences")
 
-N=10000
+N=100
 
+# Calculates number of eigenvalues less than 'sigma' in tridiagonal matrix 
+# described by: diagm(E.^0.5,-1)+diagm(D)+diagm(E.^0.5,1)
+# Nb: Off digonal elements E are supplied squared for computational speed
 function sturm(D,E,sigma)
     n=length(D)
     t=zeros(n)
@@ -16,24 +21,44 @@ function sturm(D,E,sigma)
     end
 
     for i=2:n
-        t[i]=D[i]-sigma-E[i-1]/t[i-1]
-        if t[i]<0.0
-            countnegatives=countnegatives+1
+        t[i]=D[i]-sigma-E[i-1]/t[i-1]   # Sturm sequence
+        if t[i]<0.0                     # if t<0, we've found another eigenvalue
+            countnegatives=countnegatives+1 
         end
     end
 
     return countnegatives
 end
 
+# Define potential function
+P=0.05
+B=0.025 #300K * k_B in eV
+
+U(theta)=cos(4*theta)+P*theta
+Z=sum(exp(-U/B),[0:2*pi])
+
 # Random Trace / diagonal elements
 D=5.0+0.1*randn(N)
 # Random Off-diag elements
-E=0.1+0.05*randn(N-1)
+#E=0.1+0.05*randn(N-1)
+
+function randexp(N) # random exponential with the ln(X) 0<X<1 method
+    return (log(rand(N)))
+end
+
+#p=Poly([])
+#fzero(p)
+
+#Generate thetas...
+thetas=randexp(N-1)
+#Transfer integral from
+J0=0.500 #Max Transfer integral
+E=J0*cos(thetas).^2
 # Squared (element wise) for the Sturm algorithm...
 E= E.^2
 
 println("STURM sequence method...")
-sigma=4.5
+sigma=4.0
 while sigma<=5.5
     @printf("%f %f\n", sigma , sturm(D,E,sigma))
     sigma=sigma+0.02
