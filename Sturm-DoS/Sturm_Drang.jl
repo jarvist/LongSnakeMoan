@@ -11,18 +11,17 @@ N=100
 # described by: diagm(E.^0.5,-1)+diagm(D)+diagm(E.^0.5,1)
 # Nb: Off digonal elements E are supplied squared for computational speed
 function sturm(D,E,sigma)
-    n=length(D)
-    t=zeros(n)
+    t=0.0
     countnegatives=0
     
-    t[1]=D[1]-sigma #first term of sequence, to avoid needing E[0], t[0]
-    if t[1]<0.0
+    t=D[1]-sigma #first term of sequence, to avoid needing E[0], t[0]
+    if t<0.0
         countnegatives=countnegatives+1
     end
 
-    for i=2:n
-        t[i]=D[i]-sigma-E[i-1]/t[i-1]   # Sturm sequence
-        if t[i]<0.0                     # if t<0, we've found another eigenvalue
+    for i=2:length(D)
+        t=D[i]-sigma-E[i-1]/t   # Sturm sequence, overwriting temporary files...
+        if t<0.0                     # if t<0, we've found another eigenvalue
             countnegatives=countnegatives+1 
         end
     end
