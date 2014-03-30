@@ -35,7 +35,7 @@ P=0.05
 B=0.025 #300K * k_B in eV
 
 U(theta)=cos(4*theta)+P*theta #defined as a function for further maths
-#Z=sum(exp(-U/B),[0:2*pi]) #Attempting to calculate partition function directly; this is not correct
+#Z=integral(exp(-U(theta)/B),theta,[0:2*pi]) #Attempting to calculate partition function directly; this is not correct
 
 # TODO: Some clever physics here.
 
