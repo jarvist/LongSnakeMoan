@@ -30,12 +30,13 @@ function sturm(D,E,sigma)
     return countnegatives
 end
 
+# SQUEEZED PFO FUNCTIONS
 # Define potential function
 P=0.05
 B=0.025 #300K * k_B in eV
 
-U(theta)=cos(4*theta)+P*theta
-Z=sum(exp(-U/B),[0:2*pi])
+U(theta)=cos(4*theta)+P*theta #defined as a function for further maths
+#Z=sum(exp(-U/B),[0:2*pi]) #Attempting to calculate partition function directly; this is not correct
 
 # Random Trace / diagonal elements
 D=5.0+0.1*randn(N)
