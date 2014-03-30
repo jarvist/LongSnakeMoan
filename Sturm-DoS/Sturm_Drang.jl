@@ -37,10 +37,7 @@ B=0.025 #300K * k_B in eV
 U(theta)=cos(4*theta)+P*theta #defined as a function for further maths
 #Z=sum(exp(-U/B),[0:2*pi]) #Attempting to calculate partition function directly; this is not correct
 
-# Random Trace / diagonal elements
-D=5.0+0.1*randn(N)
-# Random Off-diag elements
-#E=0.1+0.05*randn(N-1)
+# TODO: Some clever physics here.
 
 function randexp(N) # random exponential with the ln(X) 0<X<1 method
     return (log(rand(N)))
@@ -49,13 +46,23 @@ end
 #p=Poly([])
 #fzero(p)
 
+function randH()
+# Random Trace / diagonal elements
+    D=5.0+0.1*randn(N)
+# Random Off-diag elements
+#E=0.1+0.05*randn(N-1)
+
 #Generate thetas...
-thetas=randexp(N-1)
+    thetas=randexp(N-1)
 #Transfer integral from
-J0=0.500 #Max Transfer integral
-E=J0*cos(thetas).^2
+    J0=0.500 #Max Transfer integral
+    E=J0*cos(thetas).^2
 # Squared (element wise) for the Sturm algorithm...
-E= E.^2
+    E= E.^2
+    return (D,E)
+end
+
+D,E=randH()
 
 println("STURM sequence method...")
 sigma=4.0
