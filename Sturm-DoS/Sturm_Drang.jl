@@ -48,7 +48,7 @@ end
 
 function randH()
 # Random Trace / diagonal elements
-    D=5.0+0.1*randn(N)
+    D=5.0 +0.0*randn(N)
 # Random Off-diag elements
 #E=0.1+0.05*randn(N-1)
 
@@ -65,10 +65,14 @@ end
 D,E=randH()
 
 println("STURM sequence method...")
-sigma=4.0
-while sigma<=5.5
-    @printf("%f %f\n", sigma , sturm(D,E,sigma))
-    sigma=sigma+0.02
+count=0
+while count<20
+    sigma=4.0
+    while sigma<=5.5
+        @printf("%f %f\n", sigma , sturm(D,E,sigma))
+        sigma=sigma+0.02
+    end
+count=count+1
 end
 
 #println("Elements...(offdiag^2, diag))");
