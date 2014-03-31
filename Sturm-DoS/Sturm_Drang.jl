@@ -3,6 +3,8 @@
 
 #using Roots, Polynomial
 
+using Calculus
+
 println("Sturm und Drang: DoS by Sturm sequences")
 
 N=100
@@ -29,13 +31,31 @@ function sturm(D,E,sigma)
     return countnegatives
 end
 
+#units eV
+kB=8.6173324E-5
+
 # SQUEEZED PFO FUNCTIONS
 # Define potential function
-P=0.05
-B=0.025 #300K * k_B in eV
+P=1.0
+B=1/(300*kB) #300K * k_B in eV
 
-U(theta)=cos(4*theta)+P*theta #defined as a function for further maths
-#Z=integral(exp(-U(theta)/B),theta,[0:2*pi]) #Attempting to calculate partition function directly; this is not correct
+U(theta)=cos(4*theta)+P*abs(theta) #defined as a function for further maths
+
+Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) #Attempting to calculate partition function directly; this is not correct
+
+println("Partition function Z=",Z)
+
+outfile=open("data.dat","w+")
+for t = -pi:(pi/18.0):pi
+#    println("Partition function Z=",Z)
+    P=(1/Z)*exp(-U(t)*B)
+    println(t," ",P)
+    @printf(outfile,"%f %e\n",t,P)
+end
+
+close(outfile)
+
+end
 
 # TODO: Some clever physics here.
 
