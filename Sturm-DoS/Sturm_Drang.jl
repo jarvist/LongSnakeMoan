@@ -36,21 +36,24 @@ kB=8.6173324E-5
 
 # SQUEEZED PFO FUNCTIONS
 # Define potential function
-P=1.0
+P=0.05
 B=1/(300*kB) #300K * k_B in eV
 
-U(theta)=cos(4*theta)+P*abs(theta) #defined as a function for further maths
+U(theta)=( 1.0+cos(4*theta) + P*abs(theta) ) #defined as a function for further maths
 
-Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) #Attempting to calculate partition function directly; this is not correct
+Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) #Attempting to calculate partition function directly; this is correct
 
 println("Partition function Z=",Z)
 
 outfile=open("data.dat","w+")
-for t = -pi:(pi/18.0):pi
+for P=0:1.0:5
+Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) # recalculate Z now that P is changing
+    for t = -pi:(pi/1800.0):pi
 #    println("Partition function Z=",Z)
-    P=(1/Z)*exp(-U(t)*B)
-    println(t," ",P)
-    @printf(outfile,"%f %e\n",t,P)
+        p=exp(-U(t)*B)/Z
+        println(t," ",p)
+        @printf(outfile,"%f %f %f\n",t,U(t),p)
+    end
 end
 
 close(outfile)
