@@ -45,20 +45,21 @@ Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) #Attempting to calc
 
 println("Partition function Z=",Z)
 
+# Following checks the partition function code, outputting p(robability) as a fn(theta) for varying P
 outfile=open("data.dat","w+")
 for P=0:1.0:5
 Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) # recalculate Z now that P is changing
     for t = -pi:(pi/1800.0):pi
 #    println("Partition function Z=",Z)
         p=exp(-U(t)*B)/Z
-        println(t," ",p)
+#        println(t," ",p)
         @printf(outfile,"%f %f %f\n",t,U(t),p)
     end
 end
 
 close(outfile)
 
-end
+#end
 
 # TODO: Some clever physics here.
 
@@ -71,12 +72,23 @@ end
 
 function randH()
 # Random Trace / diagonal elements
-    D=5.0 +0.0*randn(N)
+    D=5.0 + 0.0*randn(N)
 # Random Off-diag elements
 #E=0.1+0.05*randn(N-1)
 
 #Generate thetas...
-    thetas=randexp(N-1)
+#    thetas=randexp(N-1)
+    thetas=Float64[]
+    for i=1:N-1
+        theta=0.0
+        while true 
+            theta=2*pi*rand()
+            p=exp(-U(theta)*B)/Z
+            p>rand() && break
+        end
+        push!(thetas,theta)
+    end
+
 #Transfer integral from
     J0=0.500 #Max Transfer integral
     E=J0*cos(thetas).^2
@@ -87,15 +99,18 @@ end
 
 D,E=randH()
 
-println("STURM sequence method...")
-count=0
-while count<20
+#println(D)
+#println(E)
+
+for P=0:1.0:5
+    Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) # recalculate Z now that P is changing
+    D,E=randH()
+    @printf("Calculated with P= %f Z= %f\n",P,Z)
+#println("STURM sequence method...")
     sigma=4.0
-    while sigma<=5.5
+    for sigma=4.0:0.2:5.5
         @printf("%f %f\n", sigma , sturm(D,E,sigma))
-        sigma=sigma+0.02
     end
-count=count+1
 end
 
 #println("Elements...(offdiag^2, diag))");
@@ -103,7 +118,7 @@ end
 
 #println("Full square matrix H");
 H=diagm(E.^0.5,-1)+diagm(D)+diagm(E.^0.5,1) #build full matrix from diagonal elements; for comparison
-#println(H)
+println(H)
 
 println("Eigenvalues")
 println(eigvals(H))
