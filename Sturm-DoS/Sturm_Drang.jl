@@ -7,7 +7,7 @@ using Calculus
 
 println("Sturm und Drang: DoS by Sturm sequences")
 
-N=100
+N=10000
 
 # Calculates number of eigenvalues less than 'sigma' in tridiagonal matrix 
 # described by: diagm(E.^0.5,-1)+diagm(D)+diagm(E.^0.5,1)
@@ -102,15 +102,24 @@ D,E=randH()
 #println(D)
 #println(E)
 
-for P=0:1.0:5
+outfile=open("DoS.dat","w+")
+
+for P=0:0.5:5
     Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) # recalculate Z now that P is changing
     D,E=randH()
     @printf("Calculated with P= %f Z= %f\n",P,Z)
 #println("STURM sequence method...")
     sigma=4.0
-    for sigma=4.0:0.2:5.5
-        @printf("%f %f\n", sigma , sturm(D,E,sigma))
+    pDoS=0
+    pold=0
+    for sigma=4.0:0.05:6.0
+        pDoS=sturm(D,E,sigma)
+        @printf("%f %f %f %f\n", P, sigma , pDoS, pDoS-pold)
+        @printf(outfile,"%f %f %f %f\n",P,sigma,pDoS, pDoS-pold)
+        pold=pDoS
     end
+end
+
 end
 
 #println("Elements...(offdiag^2, diag))");
