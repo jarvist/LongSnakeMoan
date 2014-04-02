@@ -39,15 +39,16 @@ kB=8.6173324E-5
 P=0.05
 B=1/(300*kB) #300K * k_B in eV
 
-U(theta)=( 1.0+cos(4*theta) + P*abs(theta) ) #defined as a function for further maths
+#U(theta)=( 1.0+cos(4*theta) + P*abs(theta) ) #defined as a function for further maths
+U(theta)=( cos(4*theta) + P*sin(theta)^2 ) # More physical form - increasing cost for theta=90 degrees as fn of pressure
 
 Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) #Attempting to calculate partition function directly; this is correct
 
 println("Partition function Z=",Z)
 
 # Following checks the partition function code, outputting p(robability) as a fn(theta) for varying P
-outfile=open("data.dat","w+")
-for P=0:1.0:5
+outfile=open("potential.dat","w+")
+for P=0:2.5:10
 Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) # recalculate Z now that P is changing
     for t = -pi:(pi/1800.0):pi
 #    println("Partition function Z=",Z)
@@ -104,7 +105,7 @@ D,E=randH()
 
 outfile=open("DoS.dat","w+")
 
-for P=0:0.5:5
+for P=0:1.0:10
     Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) # recalculate Z now that P is changing
     D,E=randH()
     @printf("Calculated with P= %f Z= %f\n",P,Z)
