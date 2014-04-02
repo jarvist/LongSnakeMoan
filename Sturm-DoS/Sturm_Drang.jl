@@ -40,25 +40,11 @@ P=0.05
 B=1/(300*kB) #300K * k_B in eV
 
 #U(theta)=( 1.0+cos(4*theta) + P*abs(theta) ) #defined as a function for further maths
-U(theta)=( cos(4*theta) + P*sin(theta)^2 ) # More physical form - increasing cost for theta=90 degrees as fn of pressure
+U(theta)=( 0.05* (cos(4*theta) + cos(2*theta)) + P*sin(theta)^2 ) # More physical form - increasing cost for theta=90 degrees as fn of pressure
 
 Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) #Attempting to calculate partition function directly; this is correct
 
 println("Partition function Z=",Z)
-
-# Following checks the partition function code, outputting p(robability) as a fn(theta) for varying P
-outfile=open("potential.dat","w+")
-for P=0:2.5:10
-Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) # recalculate Z now that P is changing
-    for t = -pi:(pi/1800.0):pi
-#    println("Partition function Z=",Z)
-        p=exp(-U(t)*B)/Z
-#        println(t," ",p)
-        @printf(outfile,"%f %f %f\n",t,U(t),p)
-    end
-end
-
-close(outfile)
 
 #end
 
@@ -104,22 +90,42 @@ D,E=randH()
 #println(E)
 
 outfile=open("DoS.dat","w+")
+onsetfile=open("onset.dat","w+")
+potfile=open("potential.dat","w+")
 
-for P=0:1.0:10
+for P=0.0:0.1:1
     Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) # recalculate Z now that P is changing
+
+# Following checks the partition function code, outputting p(robability) as a fn(theta) for varying P
+    for t = -pi:(pi/180.0):pi
+#    println("Partition function Z=",Z)
+        p=exp(-U(t)*B)/Z
+#        println(t," ",p)
+        @printf(potfile,"%f %f %f\n",t,U(t),p)
+    end
+e
+    
     D,E=randH()
     @printf("Calculated with P= %f Z= %f\n",P,Z)
 #println("STURM sequence method...")
     sigma=4.0
     pDoS=0
     pold=0
-    for sigma=4.0:0.05:6.0
+    onset=false
+    for sigma=3.8:0.05:6.0
         pDoS=sturm(D,E,sigma)
         @printf("%f %f %f %f\n", P, sigma , pDoS, pDoS-pold)
         @printf(outfile,"%f %f %f %f\n",P,sigma,pDoS, pDoS-pold)
+        if (pDoS-pold>10.0 && onset==false)
+            @printf(onsetfile,"%f %f %f\n",P,sigma,pDoS-pold)
+            onset=true
+        end
         pold=pDoS
     end
 end
+
+close(outfile)
+close(onsetfile)
 
 end
 
