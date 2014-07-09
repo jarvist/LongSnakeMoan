@@ -7,7 +7,7 @@ using Calculus
 
 println("Sturm und Drang: DoS by Sturm sequences")
 
-N=10000
+N=1000000
 
 # Calculates number of eigenvalues less than 'sigma' in tridiagonal matrix 
 # described by: diagm(E.^0.5,-1)+diagm(D)+diagm(E.^0.5,1)
@@ -40,11 +40,12 @@ P=0.05
 B=1/(300*kB) #300K * k_B in eV
 
 #U(theta)=( 1.0+cos(4*theta) + P*abs(theta) ) #defined as a function for further maths
-U(theta)=( 0.05* (cos(4*theta) + cos(2*theta)) + P*sin(theta)^2 ) # More physical form - increasing cost for theta=90 degrees as fn of pressure
+#U(theta)=( 0.05* (cos(4*theta) + cos(2*theta)) + P*sin(theta)^2 ) # More physical form - increasing cost for theta=90 degrees as fn of pressure
+#U(theta)=( 0.05 * sin(theta)^2 ) #P3HT like
 
-Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) #Attempting to calculate partition function directly; this is correct
+#Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) #Attempting to calculate partition function directly; this is correct
 
-println("Partition function Z=",Z)
+#println("Partition function Z=",Z)
 
 #end
 
@@ -57,9 +58,9 @@ end
 #p=Poly([])
 #fzero(p)
 
-function randH()
+function randH(disorder,B,Z,U)
 # Random Trace / diagonal elements
-    D=5.0 + 0.0*randn(N)
+    D=5.0 + disorder*randn(N)
 # Random Off-diag elements
 #E=0.1+0.05*randn(N-1)
 
@@ -84,17 +85,17 @@ function randH()
     return (D,E)
 end
 
-D,E=randH()
-
-#println(D)
-#println(E)
-
 outfile=open("DoS.dat","w+")
 onsetfile=open("onset.dat","w+")
 potfile=open("potential.dat","w+")
 
-for P=0.0:0.1:1
+P=0.0
+disorder=0.0
+
+for E0=0.0:0.1:0.5 #:0.1:1
+    U(theta)=( E0 * sin(theta)^2 ) #P3HT like
     Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) # recalculate Z now that P is changing
+    println("Partition function for Z(E0=",E0,")=",Z)
 
 # Following checks the partition function code, outputting p(robability) as a fn(theta) for varying P
     for t = -pi:(pi/180.0):pi
@@ -105,14 +106,14 @@ for P=0.0:0.1:1
     end
 e
     
-    D,E=randH()
+    D,E=randH(disorder,B,Z,U)
     @printf("Calculated with P= %f Z= %f\n",P,Z)
 #println("STURM sequence method...")
     sigma=4.0
     pDoS=0
     pold=0
     onset=false
-    for sigma=3.8:0.05:6.0
+    for sigma=3.8:0.01:6.2
         pDoS=sturm(D,E,sigma)
         @printf("%f %f %f %f\n", P, sigma , pDoS, pDoS-pold)
         @printf(outfile,"%f %f %f %f\n",P,sigma,pDoS, pDoS-pold)
