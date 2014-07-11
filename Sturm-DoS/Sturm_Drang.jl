@@ -95,7 +95,7 @@ disorder=0.0
 # 'full' potential energy Fig 4.a. puts a barrier at 90 degress of ~3.0 kCal / mol = 126 meV
 E0=0.126
 
-@sync @parallel for T=100.0:100:400 #:0.1:1
+@sync @parallel for T=300.0:0.1:300.0 #T=100.0:100:400 #:0.1:1
     B=1/(T*kB) #300K * k_B in eV
     U(theta)=( E0 * sin(theta)^2 ) #P3HT like
     Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) # recalculate Z now that P is changing
@@ -117,7 +117,7 @@ e
     pDoS=0
     pold=0
     onset=false
-    for sigma=3:0.010:7 #sigma=6:0.001:6.4 #6 to 6.4 covers right lobe
+    for sigma=6:0.001:6.4 #sigma=3:0.010:7 #sigma=6:0.001:6.4 #6 to 6.4 covers right lobe
         pDoS=sturm(D,E,sigma)
         @printf("%f %f %f %f\n", T, sigma , pDoS, pDoS-pold)
         @printf(outfile,"%f %f %f %f\n",T,sigma,pDoS, pDoS-pold)
