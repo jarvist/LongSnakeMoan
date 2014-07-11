@@ -37,7 +37,6 @@ kB=8.6173324E-5
 # SQUEEZED PFO FUNCTIONS
 # Define potential function
 P=0.05
-B=1/(300*kB) #300K * k_B in eV
 
 #U(theta)=( 1.0+cos(4*theta) + P*abs(theta) ) #defined as a function for further maths
 #U(theta)=( 0.05* (cos(4*theta) + cos(2*theta)) + P*sin(theta)^2 ) # More physical form - increasing cost for theta=90 degrees as fn of pressure
@@ -78,8 +77,8 @@ function randH(disorder,B,Z,U)
     end
 
 #Transfer integral from
-    J0=0.500 #Max Transfer integral
-    E=J0*cos(thetas).^2 
+    J0=0.800 #Max Transfer integral
+    E=(J0*cos(thetas)).^2 
 # Squared (element wise) for the Sturm algorithm...
     E= E.^2
     return (D,E)
@@ -92,7 +91,12 @@ potfile=open("potential.dat","w+")
 P=0.0
 disorder=0.0
 
-for E0=0.0:0.1:0.5 #:0.1:1
+# OK; Raos FF paper (Moreno et al. J.Phys.Chem.B 2010)
+# 'full' potential energy Fig 4.a. puts a barrier at 90 degress of ~3.0 kCal / mol = 126 meV
+E0=0.126
+
+@sync @parallel for T=100.0:100:400 #:0.1:1
+    B=1/(T*kB) #300K * k_B in eV
     U(theta)=( E0 * sin(theta)^2 ) #P3HT like
     Z=integrate(theta -> exp(-U(theta)*B),-pi,pi, :monte_carlo ) # recalculate Z now that P is changing
     println("Partition function for Z(E0=",E0,")=",Z)
@@ -113,10 +117,10 @@ e
     pDoS=0
     pold=0
     onset=false
-    for sigma=3.8:0.01:6.2
+    for sigma=3:0.010:7 #sigma=6:0.001:6.4 #6 to 6.4 covers right lobe
         pDoS=sturm(D,E,sigma)
-        @printf("%f %f %f %f\n", P, sigma , pDoS, pDoS-pold)
-        @printf(outfile,"%f %f %f %f\n",P,sigma,pDoS, pDoS-pold)
+        @printf("%f %f %f %f\n", T, sigma , pDoS, pDoS-pold)
+        @printf(outfile,"%f %f %f %f\n",T,sigma,pDoS, pDoS-pold)
         if (pDoS-pold>10.0 && onset==false)
             @printf(onsetfile,"%f %f %f\n",P,sigma,pDoS-pold)
             onset=true
