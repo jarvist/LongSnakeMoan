@@ -7,7 +7,7 @@ using Calculus
 
 println("Sturm und Drang: DoS by Sturm sequences")
 
-N=1000000
+N=100000000
 
 # Calculates number of eigenvalues less than 'sigma' in tridiagonal matrix 
 # described by: diagm(E.^0.5,-1)+diagm(D)+diagm(E.^0.5,1)
